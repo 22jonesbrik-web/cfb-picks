@@ -1,0 +1,3 @@
+import { getSession } from '@/lib/auth/session';
+import { createAdminClient } from '@/lib/supabase/admin';
+export async function requireAdmin() { const session = await getSession(); if (!session) throw new Error('UNAUTHENTICATED'); const supabase = createAdminClient(); const user = await supabase.from('users').select('role').eq('id', session.userId).eq('active', true).maybeSingle(); if (user.data?.role === 'owner' || user.data?.role === 'admin') return { session, supabase, role: user.data.role as 'owner'|'admin' }; const legacy = await supabase.from('admins').select('user_id').eq('user_id', session.userId).maybeSingle(); if (!legacy.data) throw new Error('FORBIDDEN'); return { session, supabase, role: 'admin' as const }; }

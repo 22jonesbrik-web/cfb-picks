@@ -1,0 +1,7 @@
+import { describe, expect, it } from 'vitest';
+import { assertPickCanBeWritten, visiblePicksForViewer } from '@/lib/server/pick-policy';
+import type { ContestGame, Pick, Week } from '@/types';
+const week:Week={id:'w',season:2026,weekNumber:3,name:'Week 3',status:'open',pickLockAt:'2026-09-19T16:00:00Z'};
+const game=(kickoffAt='2026-09-20T01:00:00Z'):ContestGame=>({id:'g',weekId:'w',spreadTeam:'BYU',spreadValue:-3.5,displayOrder:1,game:{id:'g',weekId:'w',awayTeam:'BYU',awayAbbr:'BYU',homeTeam:'Utah',homeAbbr:'UTAH',kickoffAt,status:'scheduled'}});
+const pick=(userId:string):Pick=>({id:userId,userId,contestGameId:'g',selectedTeam:'BYU',selectedSpread:-3.5,result:'pending'});
+describe('server pick policy',()=>{it('rejects writes at the universal deadline',()=>expect(()=>assertPickCanBeWritten(week,game(),new Date('2026-09-19T16:00:00Z'))).toThrow('locked'));it('rejects writes after an early kickoff',()=>expect(()=>assertPickCanBeWritten(week,game('2026-09-19T01:00:00Z'),new Date('2026-09-19T01:00:01Z'))).toThrow('locked'));it('returns only the viewer pick before the weekly deadline',()=>expect(visiblePicksForViewer(week,[pick('a'),pick('b')],'a',new Date('2026-09-19T15:59:59Z')).map(item=>item.userId)).toEqual(['a']));it('returns all picks at the weekly deadline',()=>expect(visiblePicksForViewer(week,[pick('a'),pick('b')],'a',new Date('2026-09-19T16:00:00Z')).map(item=>item.userId)).toEqual(['a','b']));});

@@ -1,0 +1,11 @@
+import type { Game } from '@/types';
+
+export interface SportsProvider { getUpcomingGames(season: number): Promise<Game[]>; getGameResults(gameIds: string[]): Promise<Partial<Game>[]>; }
+
+export class OptionalOddsApiProvider implements SportsProvider {
+  private readonly apiKey = process.env.SPORTS_API_KEY;
+  private readonly baseUrl = 'https://api.the-odds-api.com/v4/sports/americanfootball_ncaaf';
+  private async request<T>(path: string): Promise<T> { if (!this.apiKey) return [] as T; const response = await fetch(`${this.baseUrl}${path}${path.includes('?') ? '&' : '?'}apiKey=${encodeURIComponent(this.apiKey)}`, { next: { revalidate: 900 } }); if (!response.ok) throw new Error(`Sports provider returned ${response.status}.`); return response.json() as Promise<T>; }
+  async getUpcomingGames(): Promise<Game[]> { type Event={id:string;commence_time:string;home_team:string;away_team:string}; type Odds=Event&{bookmakers?:Array<{markets?:Array<{key:string;outcomes?:Array<{name:string;point?:number}>}>}>}; const events=await this.request<Event[]>('/events'); const odds=await this.request<Odds[]>('/odds/?regions=us&markets=spreads&oddsFormat=decimal'); const oddsById=new Map(odds.map(event=>[event.id,event])); return events.map(event=>{const market=oddsById.get(event.id)?.bookmakers?.flatMap(bookmaker=>bookmaker.markets??[]).find(item=>item.key==='spreads');const favorite=market?.outcomes?.find(outcome=>typeof outcome.point==='number'&&outcome.point<0);return{id:event.id,weekId:'',awayTeam:event.away_team,awayAbbr:event.away_team.slice(0,4).toUpperCase(),homeTeam:event.home_team,homeAbbr:event.home_team.slice(0,4).toUpperCase(),kickoffAt:event.commence_time,sportsbookSpreadTeam:favorite?.name,sportsbookSpreadValue:favorite?.point,status:'scheduled'};}); }
+  async getGameResults(gameIds: string[]): Promise<Partial<Game>[]> { if (!this.apiKey || gameIds.length === 0) return []; const scores = await this.request<Array<{ id: string; completed: boolean; scores?: Array<{ name: string; score: string }> }>>('/scores?daysFrom=3'); return scores.filter((score) => gameIds.includes(score.id) && score.completed && score.scores?.length === 2).map((score) => ({ id: score.id, status: 'final', awayScore: Number(score.scores![0].score), homeScore: Number(score.scores![1].score) })); }
+}

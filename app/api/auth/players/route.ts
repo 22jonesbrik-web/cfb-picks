@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/admin';
+export async function GET() { if (process.env.DEMO_MODE === 'true' && !process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ players: ['Bridger', 'Luke', 'Jackson', 'Travis'] }); try { const supabase=createAdminClient(); const {data,error}=await supabase.from('users').select('display_name').eq('active',true).order('display_name'); if(error)throw error; return NextResponse.json({players:data.map(user=>user.display_name)}); } catch { return NextResponse.json({error:'Players could not be loaded.'},{status:503}); } }

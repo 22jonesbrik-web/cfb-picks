@@ -1,0 +1,4 @@
+import { getSession } from '@/lib/auth/session';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { findDemoUserById } from '@/lib/auth/demo-store';
+export async function getAccount() { const session=await getSession(); if(!session)throw new Error('UNAUTHENTICATED'); if(process.env.DEMO_MODE==='true'&&!process.env.SUPABASE_SERVICE_ROLE_KEY){const user=findDemoUserById(session.userId);if(!user)throw new Error('ACCOUNT_NOT_FOUND');return {id:user.id,email:user.email,display_name:user.display_name,role:user.role,active:true,created_at:new Date().toISOString()};} const supabase=createAdminClient(); const result=await supabase.from('users').select('id,email,display_name,role,active,created_at').eq('id',session.userId).maybeSingle(); if(result.error||!result.data)throw new Error('ACCOUNT_NOT_FOUND'); return result.data; }

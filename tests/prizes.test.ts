@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { rankWeeklyEntries } from '@/lib/standings/prizes';
+describe('weekly prizes',()=>{it('ranks by points, then closest tiebreaker, then name',()=>{const result=rankWeeklyEntries([{userId:'a',displayName:'Alpha',points:44,tieDifference:3},{userId:'b',displayName:'Beta',points:44,tieDifference:1},{userId:'c',displayName:'Gamma',points:40,tieDifference:0},{userId:'d',displayName:'Delta',points:39,tieDifference:0}]);expect(result.map(entry=>[entry.displayName,entry.place,entry.amount])).toEqual([['Beta',1,115],['Alpha',2,70],['Gamma',3,35]])})});

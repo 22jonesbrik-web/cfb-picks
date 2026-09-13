@@ -1,0 +1,3 @@
+import { describe, expect, it } from 'vitest';
+import { canAddContestGame, validateConfidenceWeights } from '@/lib/picks/weights';
+describe('weekly game and confidence limits',()=>{it('requires exactly weights 1 through 10',()=>{expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,10]).valid).toBe(true);expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,9]).valid).toBe(false);expect(validateConfidenceWeights([1,2,3]).valid).toBe(false)});it('caps active contest games at 16',()=>{expect(canAddContestGame(15)).toBe(true);expect(canAddContestGame(16)).toBe(false)})});

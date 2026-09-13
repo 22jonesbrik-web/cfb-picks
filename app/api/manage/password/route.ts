@@ -1,0 +1,5 @@
+import { NextResponse } from 'next/server';
+import { getSession, hashPassword } from '@/lib/auth/session';
+import { createAdminClient } from '@/lib/supabase/admin';
+import { updateDemoPassword } from '@/lib/auth/demo-store';
+export async function PATCH(request:Request){const session=await getSession();if(!session)return NextResponse.json({error:'Sign in required.'},{status:401});const body=await request.json() as {password?:string};if(!body.password||body.password.length<8)return NextResponse.json({error:'Password must be at least 8 characters.'},{status:400});try{if(process.env.DEMO_MODE==='true'&&!process.env.SUPABASE_SERVICE_ROLE_KEY){updateDemoPassword(session.userId,body.password);return NextResponse.json({ok:true});}const supabase=createAdminClient();const result=await supabase.from('users').update({password_hash:hashPassword(body.password)}).eq('id',session.userId);if(result.error)throw result.error;await supabase.from('admin_audit_log').insert({admin_id:session.userId,action:'change_own_password'});return NextResponse.json({ok:true});}catch{return NextResponse.json({error:'Password could not be changed.'},{status:500});}}
