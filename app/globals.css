@@ -39,3 +39,48 @@
 .game-card:nth-child(4) .team-pick:nth-child(1) { background-image:url('https://a.espncdn.com/i/teamlogos/ncaa/500/61.png'); background-repeat:no-repeat; background-position:12px 12px; background-size:28px; padding-left:48px; }
 .game-card:nth-child(4) .team-pick:nth-of-type(2) { background-image:url('https://a.espncdn.com/i/teamlogos/ncaa/500/96.png'); background-repeat:no-repeat; background-position:12px 12px; background-size:28px; padding-left:48px; }
 @media (max-width:520px) { .shell { padding-left:14px; padding-right:14px; } .teams { gap:8px; padding:14px 10px; } .team-pick { min-height:86px; padding:10px; } .team-abbr { font-size:21px; } .intro { align-items:flex-start; flex-direction:column; } }
+
+/* Mobile submission dock */
+.pick-dock { margin:18px 0; padding:14px; color:#fff; background:var(--navy); border:1px solid rgba(255,255,255,.14); border-radius:8px; box-shadow:0 10px 24px rgba(16,36,58,.18); }
+.pick-dock__progress { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.pick-dock__progress strong { display:block; font-family:'Barlow Condensed',sans-serif; font-size:24px; line-height:1; }
+.pick-dock__eyebrow { display:block; margin-bottom:4px; color:#b9c7d5; font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+.pick-meter { display:grid; grid-template-columns:repeat(10, minmax(5px, 1fr)); gap:4px; width:min(240px, 42vw); }
+.pick-meter span { height:8px; background:#405268; border-radius:2px; transition:background-color 160ms ease, transform 160ms ease; }
+.pick-meter span.is-filled { background:var(--orange); transform:scaleY(1.25); }
+.pick-dock__actions { display:grid; grid-template-columns:minmax(150px, 1fr) minmax(150px, auto); gap:10px; margin-top:14px; }
+.tiebreaker-field { display:flex; align-items:center; gap:10px; min-height:48px; padding-left:12px; color:#d9e3ec; background:#1a314a; border:1px solid #52647a; border-radius:6px; font-size:12px; font-weight:700; }
+.tiebreaker-field span { flex:1; }
+.tiebreaker-field input { width:88px; height:46px; padding:0 10px; color:var(--navy); background:#fff; border:0; border-left:1px solid #52647a; border-radius:0 5px 5px 0; font-size:16px; }
+.submit-picks-button { min-height:48px; padding:0 18px; color:var(--navy); background:var(--orange); border:2px solid var(--orange); border-radius:6px; font-weight:800; cursor:pointer; transition:background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.submit-picks-button:not(:disabled):active { transform:translateY(1px) scale(.99); }
+.submit-picks-button:disabled { color:#9daaba; background:#405268; border-color:#405268; cursor:not-allowed; }
+.pick-dock__guidance,.pick-dock__message { margin:10px 0 0; color:#c7d2de; font-size:12px; }
+.pick-dock__message { color:#fff; font-weight:700; }
+.pick-dock.is-complete { border-color:rgba(255,181,71,.7); }
+.team-pick { transition:background-color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.team-pick:not(:disabled):active { transform:scale(.985); }
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+
+@media (min-width:760px) {
+  .pick-dock { display:grid; grid-template-columns:minmax(280px, 1fr) minmax(360px, auto); align-items:center; gap:16px 28px; padding:16px 18px; }
+  .pick-dock__actions { margin-top:0; }
+  .pick-dock__guidance,.pick-dock__message { grid-column:1 / -1; margin-top:-6px; }
+}
+
+@media (max-width:759px) {
+  .shell { padding-bottom:28px; }
+  .pick-dock { position:sticky; bottom:max(10px, env(safe-area-inset-bottom)); z-index:15; }
+  .intro > .progress { display:none; }
+  .manager-links { bottom:calc(180px + env(safe-area-inset-bottom)); }
+}
+
+@media (max-width:390px) {
+  .pick-dock__actions { grid-template-columns:1fr; }
+  .pick-meter { width:38vw; }
+  .manager-links { bottom:calc(240px + env(safe-area-inset-bottom)); }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .pick-meter span,.submit-picks-button,.team-pick { transition:none; }
+}
