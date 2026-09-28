@@ -1,3 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { canAddContestGame, validateConfidenceWeights } from '@/lib/picks/weights';
-describe('weekly game and confidence limits',()=>{it('requires exactly weights 1 through 10',()=>{expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,10]).valid).toBe(true);expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,9]).valid).toBe(false);expect(validateConfidenceWeights([1,2,3]).valid).toBe(false)});it('caps active contest games at 16',()=>{expect(canAddContestGame(15)).toBe(true);expect(canAddContestGame(16)).toBe(false)})});
+import { canAddContestGame, getHighestUnusedConfidence, validateConfidenceWeights } from '@/lib/picks/weights';
+describe('weekly game and confidence limits',()=>{it('requires exactly weights 1 through 10',()=>{expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,10]).valid).toBe(true);expect(validateConfidenceWeights([1,2,3,4,5,6,7,8,9,9]).valid).toBe(false);expect(validateConfidenceWeights([1,2,3]).valid).toBe(false)});it('assigns the highest unused confidence value',()=>{expect(getHighestUnusedConfidence([])).toBe(10);expect(getHighestUnusedConfidence([10,8,4])).toBe(9);expect(getHighestUnusedConfidence([1,2,3,4,5,6,7,8,9,10])).toBeNull()});it('caps active contest games at 16',()=>{expect(canAddContestGame(15)).toBe(true);expect(canAddContestGame(16)).toBe(false)})});
+
